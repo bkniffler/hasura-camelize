@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "vivaxy.vscode-conventional-commits",
+    "firsttris.vscode-jest-runner",
+    "editorconfig.editorconfig"
+  ]
+}
