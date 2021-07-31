@@ -5,7 +5,17 @@
 ```bash
 npm i -g hasura-camelize
 
+# Easy
+hasura-camelize --host https://some.domain --secret some-secret
+
+# Dry
 hasura-camelize --host https://some.domain --secret some-secret --dry
+
+# Exclude table names
+hasura-camelize --host https://some.domain --secret some-secret --exclude some_table
+
+# Include table names
+hasura-camelize --host https://some.domain --secret some-secret --include some_table
 ```
 
 ## From code
@@ -63,10 +73,11 @@ convert(
     // Transform column names differently
     transformColumnNames(
       name,
+      tableName,
       defaultTransformer
     ) {
       // if name === some_name then ignore the column
-      if (name === 'some_name') return false;
+      if (name === 'some_name' && tableName === 'some_name') return false;
       return defaultTransformer(name);
     };
     // Apply different root field names

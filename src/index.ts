@@ -18,6 +18,7 @@ export async function hasuraCamelize(
     ) => OptionalResultType<defaults.TableNameConvertedType>;
     transformColumnNames?: (
       name: string,
+      tableName: string,
       defaultTransformer: typeof defaults.columnNameTransformer
     ) => OptionalResultType<string>;
     getRootFieldNames?: (
@@ -43,6 +44,7 @@ export async function hasuraCamelize(
     const customColumnNames = data[tableName].reduce((state, value) => {
       const columnName = transformColumnNames(
         value,
+        tableName,
         defaults.columnNameTransformer
       );
       if (columnName) {
