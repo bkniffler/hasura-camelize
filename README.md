@@ -1,5 +1,13 @@
 # Hasura TableName converter
 
+## CLI
+
+```bash
+npm i -g hasura-camelize
+
+hasura-camelize --host https://some.domain --secret some-secret --dry
+```
+
 ## From code
 
 ### Simple
