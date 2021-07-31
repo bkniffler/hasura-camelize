@@ -82,6 +82,6 @@ convert(
 
 ## Credits
 
-Original github issue in hasura repository: https://github.com/hasura/graphql-engine/issues/3320
-User @svarlamov for https://github.com/exlinc/hasura-enforce-camel-case
-User @m-rgba for https://github.com/m-rgba/hasura-snake-to-camel
+- Original github issue in hasura repository: https://github.com/hasura/graphql-engine/issues/3320
+- User @svarlamov for https://github.com/exlinc/hasura-enforce-camel-case
+- User @m-rgba for https://github.com/m-rgba/hasura-snake-to-camel
