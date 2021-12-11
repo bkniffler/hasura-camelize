@@ -15,6 +15,7 @@ require('../build/main').hasuraCamelize(
   },
   {
     dry: argv.dry,
+    relations: argv.relations,
     transformTableNames(tableName, defaultTransform) {
       if (exclude && exclude.includes(tableName)) {
         return undefined;

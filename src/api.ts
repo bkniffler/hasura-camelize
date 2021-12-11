@@ -1,3 +1,4 @@
+import { MetadataType } from './types';
 import fetch from 'node-fetch';
 
 const defaultSource = 'default';
@@ -78,4 +79,44 @@ export async function pushData(
     }),
     headers: { 'x-hasura-admin-secret': secret },
   });
+}
+
+export async function pushRelationshipData(
+  { host, secret, source = defaultSource }: DBOptionsType,
+  args: {
+    tableName: string;
+    oldName: string;
+    newName: string;
+  }
+) {
+  await fetch(`${host}/v1/metadata`, {
+    method: 'post',
+    body: JSON.stringify({
+      type: 'pg_rename_relationship',
+      args: {
+        table: args.tableName,
+        name: args.oldName,
+        source,
+        new_name: args.newName,
+      },
+    }),
+    headers: { 'x-hasura-admin-secret': secret },
+  });
+}
+
+export async function getMetadata({
+  host,
+  secret,
+  source = defaultSource,
+}: DBOptionsType): Promise<MetadataType> {
+  const data = await fetch(`${host}/v1/metadata`, {
+    method: 'post',
+    body: JSON.stringify({
+      type: 'export_metadata',
+      version: 2,
+      args: {},
+    }),
+    headers: { 'x-hasura-admin-secret': secret },
+  });
+  return data.json();
 }

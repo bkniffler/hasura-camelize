@@ -7,11 +7,13 @@ export async function hasuraCamelize(
   dbOptions: api.DBOptionsType,
   {
     dry = false,
+    relations = false,
     transformTableNames = defaults.tableNameTransformer,
     getRootFieldNames = defaults.rootFieldTransformer,
     transformColumnNames = defaults.columnNameTransformer,
   }: {
     dry?: boolean;
+    relations?: boolean;
     transformTableNames?: (
       name: string,
       defaultTransformer: typeof defaults.tableNameTransformer
@@ -28,6 +30,7 @@ export async function hasuraCamelize(
   }
 ) {
   if (!dbOptions.host) throw new Error('No host provided');
+  const meta = await api.getMetadata(dbOptions);
   const data = await api.fetchData(dbOptions);
 
   for (const tableName in data) {
@@ -54,17 +57,13 @@ export async function hasuraCamelize(
     }, {});
 
     console.log(
-      JSON.stringify(
-        {
-          table: tableName,
-          tableNames,
-          columns: customColumnNames,
-          rootFields: customRootFields,
-        },
-        null,
-        2
-      )
+      `${tableName} -> ${tableNames.singular} / ${tableNames.plural}`
     );
+    for (const key in customRootFields)
+      console.log(`  ${key}: ${customRootFields[key]}`);
+    console.log(`columns`);
+    for (const key in customColumnNames)
+      console.log(`  ${key}: ${customColumnNames[key]}`);
 
     if (!dry) {
       await api.pushData(dbOptions, {
@@ -73,6 +72,48 @@ export async function hasuraCamelize(
         customRootFields,
         customTableName: tableNames.singular,
       });
+    }
+  }
+  if (relations) {
+    for (const source of meta.metadata.sources) {
+      for (const table of source.tables) {
+        if (table.array_relationships)
+          for (const rel of table.array_relationships) {
+            const newName = transformColumnNames(
+              rel.name,
+              table.table.name,
+              defaults.columnNameTransformer
+            );
+            if (rel.name !== newName && newName) {
+              console.log(`${rel.name} => ${newName}`);
+              if (!dry) {
+                await api.pushRelationshipData(dbOptions, {
+                  tableName: table.table.name,
+                  newName,
+                  oldName: rel.name,
+                });
+              }
+            }
+          }
+        if (table.object_relationships)
+          for (const rel of table.object_relationships) {
+            const newName = transformColumnNames(
+              rel.name,
+              table.table.name,
+              defaults.columnNameTransformer
+            );
+            if (rel.name !== newName && newName) {
+              console.log(`${rel.name} => ${newName}`);
+              if (!dry) {
+                await api.pushRelationshipData(dbOptions, {
+                  tableName: table.table.name,
+                  newName,
+                  oldName: rel.name,
+                });
+              }
+            }
+          }
+      }
     }
   }
 }
