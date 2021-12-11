@@ -1,4 +1,4 @@
-# Hasura TableName converter
+# Hasura table/column/relations camelizer
 
 ## CLI
 
@@ -16,6 +16,9 @@ hasura-camelize --host https://some.domain --secret some-secret --exclude some_t
 
 # Include table names
 hasura-camelize --host https://some.domain --secret some-secret --include some_table
+
+# Rename relations
+hasura-camelize --host https://some.domain --secret some-secret --relations
 ```
 
 ## From code
@@ -61,6 +64,8 @@ convert(
   {
     // Dry run? (don't apply changes)
     dry: false,
+    // Rename relations? (default false)
+    relations: true,
     // Transform table names differently
     transformTableNames(
       name,
