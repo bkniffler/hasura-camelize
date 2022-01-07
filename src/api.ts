@@ -55,7 +55,7 @@ export async function fetchData({
 }
 
 export async function pushData(
-  { host, secret, source = defaultSource }: DBOptionsType,
+  { host, secret, schema, source = defaultSource }: DBOptionsType,
   args: {
     tableName: string;
     customTableName: string;
@@ -68,7 +68,10 @@ export async function pushData(
     body: JSON.stringify({
       type: 'pg_set_table_customization',
       args: {
-        table: args.tableName,
+        table: {
+          schema,
+          name: args.tableName,
+        },
         source,
         configuration: {
           custom_root_fields: args.customRootFields,
@@ -82,7 +85,7 @@ export async function pushData(
 }
 
 export async function pushRelationshipData(
-  { host, secret, source = defaultSource }: DBOptionsType,
+  { host, secret, schema, source = defaultSource }: DBOptionsType,
   args: {
     tableName: string;
     oldName: string;
@@ -94,7 +97,10 @@ export async function pushRelationshipData(
     body: JSON.stringify({
       type: 'pg_rename_relationship',
       args: {
-        table: args.tableName,
+        table: {
+          schema,
+          name: args.tableName,
+        },
         name: args.oldName,
         source,
         new_name: args.newName,
