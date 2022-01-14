@@ -34,8 +34,14 @@ export async function hasuraCamelize(
   const data = await api.fetchData(dbOptions);
 
   for (const tableName in data) {
+    let tableNameWithSource = tableName;
+
+    if (dbOptions.source !== 'default') {
+      tableNameWithSource = `${dbOptions.source}_${tableName}`;
+    }
+
     const tableNames = transformTableNames(
-      tableName,
+      tableNameWithSource,
       defaults.tableNameTransformer
     );
     if (!tableNames) continue;
