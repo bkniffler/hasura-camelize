@@ -1,8 +1,8 @@
 import { MetadataType } from './types';
 import fetch, { RequestInit } from 'node-fetch';
 
-const defaultSource = 'default';
-const defaultSchema = 'public';
+export const defaultSource = 'default';
+export const defaultSchema = 'public';
 
 export interface DBOptionsType {
   host: string;

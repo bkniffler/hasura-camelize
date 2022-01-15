@@ -9,6 +9,7 @@
     "hasura-camelize": "./bin/cli.js"
   },
   "scripts": {
+    "dev": "run-p build:* && node dev.js",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.main.json",
     "build:module": "tsc -p tsconfig.module.json"
@@ -20,6 +21,7 @@
     "yargs": "^17.0.1"
   },
   "devDependencies": {
+    "dotenv": "^12.0.3",
     "@types/node-fetch": "^2.5.12",
     "@types/pluralize": "^0.0.29",
     "@typescript-eslint/eslint-plugin": "^4.28.4",

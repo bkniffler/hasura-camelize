@@ -1,5 +1,6 @@
 import * as api from './api';
 import * as defaults from './defaults';
+export { defaultSchema, defaultSource } from './api';
 
 export type OptionalResultType<T> = T | undefined | false;
 
@@ -30,6 +31,17 @@ export async function hasuraCamelize(
   }
 ) {
   if (!dbOptions.host) throw new Error('No host provided');
+
+  console.log('--- Settings ---');
+  for (const key in dbOptions) {
+    let value = dbOptions[key] || '<none>';
+    if (key === 'secret' && dbOptions[key]) value = '<secret>';
+    console.log(`${key}: ${value}`);
+  }
+  console.log(`dry: ${dry}`);
+  console.log(`relations: ${dry}`);
+
+  console.log('\n--- Starting ---');
   const meta = await api.getMetadata(dbOptions);
   const data = await api.fetchData(dbOptions);
 

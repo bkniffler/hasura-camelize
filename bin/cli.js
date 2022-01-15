@@ -3,15 +3,21 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const argv = yargs(hideBin(process.argv)).argv;
+const {
+  hasuraCamelize,
+  defaultSchema,
+  defaultSource,
+} = require('../build/main');
 
 const exclude = argv.exclude && argv.exclude.split(',').map((x) => x.trim());
 const include = argv.include && argv.include.split(',').map((x) => x.trim());
-require('../build/main').hasuraCamelize(
+
+hasuraCamelize(
   {
     host: argv.host,
     secret: argv.secret,
-    schema: argv.schema,
-    source: argv.source,
+    schema: argv.schema || defaultSchema,
+    source: argv.source || defaultSource,
   },
   {
     dry: argv.dry,
@@ -26,4 +32,4 @@ require('../build/main').hasuraCamelize(
       return defaultTransform(tableName);
     },
   }
-);
+).catch((err) => console.error(err));
