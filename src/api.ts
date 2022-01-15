@@ -1,5 +1,5 @@
 import { MetadataType } from './types';
-import fetch from 'node-fetch';
+import fetch, { RequestInit } from 'node-fetch';
 
 const defaultSource = 'default';
 const defaultSchema = 'public';
@@ -18,28 +18,24 @@ export async function fetchData({
   schema = defaultSchema,
   source = defaultSource,
 }: DBOptionsType) {
-  const column_names_resp = await fetch(`${host}/v2/query`, {
-    method: 'post',
-    body: JSON.stringify({
-      type: 'run_sql',
-      args: {
-        source,
-        sql: `SELECT column_name, table_name, is_generated, is_identity, identity_generation FROM information_schema.columns where table_schema = '${schema}';`,
-        cascade: false,
-        read_only: true,
+  const { result } = await fetchJson<{ result: string[][] }>(
+    `${host}/v2/query`,
+    {
+      method: 'post',
+      body: {
+        type: 'run_sql',
+        args: {
+          source,
+          sql: `SELECT column_name, table_name, is_generated, is_identity, identity_generation FROM information_schema.columns where table_schema = '${schema}';`,
+          cascade: false,
+          read_only: true,
+        },
       },
-    }),
-    headers: {
-      'x-hasura-admin-secret': secret,
-    },
-  });
-  const json = await column_names_resp.json();
-  const result = json.result as string[][];
-  if (!result) {
-    throw new Error(
-      'Unexpected response, please check that host/secret are correct'
-    );
-  }
+      headers: {
+        'x-hasura-admin-secret': secret,
+      },
+    }
+  );
   const data = result.reduce<{ [s: string]: string[] }>((state, value) => {
     if (value[1] !== 'table_name') {
       const fieldName = value[0];
@@ -63,9 +59,9 @@ export async function pushData(
     customColumnNames: { [s: string]: string };
   }
 ) {
-  await fetch(`${host}/v1/metadata`, {
+  await fetchJson(`${host}/v1/metadata`, {
     method: 'post',
-    body: JSON.stringify({
+    body: {
       type: 'pg_set_table_customization',
       args: {
         table: {
@@ -79,7 +75,7 @@ export async function pushData(
           custom_column_names: args.customColumnNames,
         },
       },
-    }),
+    },
     headers: { 'x-hasura-admin-secret': secret },
   });
 }
@@ -92,9 +88,9 @@ export async function pushRelationshipData(
     newName: string;
   }
 ) {
-  await fetch(`${host}/v1/metadata`, {
+  await fetchJson(`${host}/v1/metadata`, {
     method: 'post',
-    body: JSON.stringify({
+    body: {
       type: 'pg_rename_relationship',
       args: {
         table: {
@@ -105,7 +101,7 @@ export async function pushRelationshipData(
         source,
         new_name: args.newName,
       },
-    }),
+    },
     headers: { 'x-hasura-admin-secret': secret },
   });
 }
@@ -113,7 +109,6 @@ export async function pushRelationshipData(
 export async function getMetadata({
   host,
   secret,
-  source = defaultSource,
 }: DBOptionsType): Promise<MetadataType> {
   const data = await fetch(`${host}/v1/metadata`, {
     method: 'post',
@@ -125,4 +120,33 @@ export async function getMetadata({
     headers: { 'x-hasura-admin-secret': secret },
   });
   return data.json();
+}
+
+async function fetchJson<Result>(
+  url: string,
+  options?: Omit<RequestInit, 'body'> & { body?: unknown }
+) {
+  const body =
+    options?.body === undefined ? undefined : JSON.stringify(options.body);
+
+  const result = await fetch(url, {
+    ...options,
+    body,
+  });
+
+  if (result.ok === false) {
+    const { code, error: message } = await result
+      .json()
+      .catch((error) => ({ code: 'unknown', error: error?.message }));
+
+    throw new HasuraError(message, code);
+  }
+
+  return result.json() as Promise<Result>;
+}
+
+class HasuraError extends Error {
+  constructor(message: string, public readonly code: string) {
+    super(message);
+  }
 }
