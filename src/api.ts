@@ -93,10 +93,8 @@ export async function fetchPGMaterializedViewData({
               JOIN pg_namespace s on t.relnamespace = s.oid
             WHERE a.attnum > 0
               AND NOT a.attisdropped
-              AND t.relname in (${viewNames
-                .map((x) => `'${x}'`)
-                .join(', ')}) --<< replace with the name of the MV
-              AND s.nspname = 'public' --<< change to the schema your MV is in
+              AND t.relname in (${viewNames.map((x) => `'${x}'`).join(', ')})
+              AND s.nspname = '${schema}'
             ORDER BY a.attnum;
           `,
           cascade: false,
