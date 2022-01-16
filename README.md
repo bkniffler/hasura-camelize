@@ -1,25 +1,27 @@
 # Hasura table/column/relations camelizer
 
-## CLI
+## Installation
 
 ```bash
 npm i -g hasura-camelize
-
-# Easy
-hasura-camelize --host https://some.domain --secret some-secret
-
-# Dry
-hasura-camelize --host https://some.domain --secret some-secret --dry
-
-# Exclude table names
-hasura-camelize --host https://some.domain --secret some-secret --exclude some_table
-
-# Include table names
-hasura-camelize --host https://some.domain --secret some-secret --include some_table
-
-# Rename relations
-hasura-camelize --host https://some.domain --secret some-secret --relations
 ```
+
+## Usage
+
+```bash
+# Table names, rootfields, relation names and materialized views
+hasura-camelize --host https://some.domain --secret some-secret --relations --pgMaterializedViews
+```
+
+## Args/Flags
+
+- _required_ host=string: Host, e.g. https://some.domain
+- _optional_ secret=string: Admin secret if set
+- _optional_ dry: Only show what would be done, without actually doing it
+- _optional_ exclude=string[]: Exclude tables from being changed
+- _optional_ include=string[]: Only change the tables specified
+- _optional_ _new_ relations: relation names to be renamed
+- _optional_ _new_ pgMaterializedViews: Rename postgresql materialized views/columns also
 
 ## From code
 
@@ -37,6 +39,8 @@ convert(
     host: 'http://127.0.0.1:3000',
     // admin secret
     secret: 'some-secret',
+    // more flags as seen above
+    relations: true,
   }
 );
 ```

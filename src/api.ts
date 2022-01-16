@@ -1,14 +1,21 @@
-import { MetadataType } from './types';
+import { DBOptionsType, MetadataType } from './types';
 import fetch, { RequestInit } from 'node-fetch';
 
 export const defaultSource = 'default';
 export const defaultSchema = 'public';
 
-export interface DBOptionsType {
-  host: string;
-  secret: string;
-  source?: string;
-  schema?: string;
+function sqlColumnInfoToObject(result: string[][], ignore: string) {
+  return result.reduce<{ [s: string]: string[] }>((state, value) => {
+    if (value[1] !== ignore) {
+      const fieldName = value[0];
+      const tableName = value[1];
+      if (!state[tableName]) {
+        state[tableName] = [];
+      }
+      state[tableName].push(fieldName);
+    }
+    return state;
+  }, {});
 }
 
 // Get tables and table columns
@@ -36,18 +43,73 @@ export async function fetchData({
       },
     }
   );
-  const data = result.reduce<{ [s: string]: string[] }>((state, value) => {
-    if (value[1] !== 'table_name') {
-      const fieldName = value[0];
-      const tableName = value[1];
-      if (!state[tableName]) {
-        state[tableName] = [];
-      }
-      state[tableName].push(fieldName);
-    }
+  return sqlColumnInfoToObject(result, 'table_name');
+}
+
+// Get tables and table columns
+export async function fetchPGMaterializedViewData({
+  host,
+  secret,
+  schema = defaultSchema,
+  source = defaultSource,
+}: DBOptionsType) {
+  const views = await fetchJson<{ result: string[][] }>(`${host}/v2/query`, {
+    method: 'post',
+    body: {
+      type: 'run_sql',
+      args: {
+        source,
+        sql: `SELECT matviewname FROM pg_matviews WHERE schemaname = '${schema}';`,
+        cascade: false,
+        read_only: true,
+      },
+    },
+    headers: {
+      'x-hasura-admin-secret': secret,
+    },
+  });
+
+  const viewNames = views.result.reduce<string[]>((state, value, i) => {
+    if (i === 0) return state;
+    state.push(value[0]);
     return state;
-  }, {});
-  return data;
+  }, []);
+
+  const { result } = await fetchJson<{ result: string[][] }>(
+    `${host}/v2/query`,
+    {
+      method: 'post',
+      body: {
+        type: 'run_sql',
+        args: {
+          source,
+          sql: `
+            SELECT a.attname,
+                  t.relname,
+                  pg_catalog.format_type(a.atttypid, a.atttypmod),
+                  a.attnotnull
+            FROM pg_attribute a
+              JOIN pg_class t on a.attrelid = t.oid
+              JOIN pg_namespace s on t.relnamespace = s.oid
+            WHERE a.attnum > 0
+              AND NOT a.attisdropped
+              AND t.relname in (${viewNames
+                .map((x) => `'${x}'`)
+                .join(', ')}) --<< replace with the name of the MV
+              AND s.nspname = 'public' --<< change to the schema your MV is in
+            ORDER BY a.attnum;
+          `,
+          cascade: false,
+          read_only: true,
+        },
+      },
+      headers: {
+        'x-hasura-admin-secret': secret,
+      },
+    }
+  );
+
+  return sqlColumnInfoToObject(result, 'relname');
 }
 
 export async function pushData(

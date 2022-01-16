@@ -1,3 +1,27 @@
+export interface DBOptionsType {
+  host: string;
+  secret: string;
+  source?: string;
+  schema?: string;
+}
+
+export type RootFieldsType = {
+  select: string;
+  select_by_pk: string;
+  select_aggregate: string;
+  insert: string;
+  insert_one: string;
+  update: string;
+  update_by_pk: string;
+  delete: string;
+  delete_by_pk: string;
+};
+
+export type TableNameConvertedType = {
+  singular: string;
+  plural: string;
+};
+
 export type MetadataType = {
   resource_version: number;
   metadata: {

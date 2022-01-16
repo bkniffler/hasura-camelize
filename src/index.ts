@@ -1,33 +1,36 @@
 import * as api from './api';
 import * as defaults from './defaults';
+import { DBOptionsType, RootFieldsType, TableNameConvertedType } from './types';
 export { defaultSchema, defaultSource } from './api';
 
 export type OptionalResultType<T> = T | undefined | false;
 
 export async function hasuraCamelize(
-  dbOptions: api.DBOptionsType,
+  dbOptions: DBOptionsType,
   {
     dry = false,
     relations = false,
+    pgMaterializedViews = false,
     transformTableNames = defaults.tableNameTransformer,
     getRootFieldNames = defaults.rootFieldTransformer,
     transformColumnNames = defaults.columnNameTransformer,
   }: {
     dry?: boolean;
     relations?: boolean;
+    pgMaterializedViews?: boolean;
     transformTableNames?: (
       name: string,
       defaultTransformer: typeof defaults.tableNameTransformer
-    ) => OptionalResultType<defaults.TableNameConvertedType>;
+    ) => OptionalResultType<TableNameConvertedType>;
     transformColumnNames?: (
       name: string,
       tableName: string,
       defaultTransformer: typeof defaults.columnNameTransformer
     ) => OptionalResultType<string>;
     getRootFieldNames?: (
-      name: defaults.TableNameConvertedType,
+      name: TableNameConvertedType,
       defaultTransformer: typeof defaults.rootFieldTransformer
-    ) => defaults.RootFieldsType;
+    ) => RootFieldsType;
   }
 ) {
   if (!dbOptions.host) throw new Error('No host provided');
@@ -44,6 +47,13 @@ export async function hasuraCamelize(
   console.log('\n--- Starting ---');
   const meta = await api.getMetadata(dbOptions);
   const data = await api.fetchData(dbOptions);
+
+  if (pgMaterializedViews) {
+    const materializedViews = await api.fetchPGMaterializedViewData(dbOptions);
+    for (const key in materializedViews) {
+      data[key] = materializedViews[key];
+    }
+  }
 
   for (const tableName in data) {
     const tableNames = transformTableNames(

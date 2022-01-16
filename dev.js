@@ -14,7 +14,8 @@ hasuraCamelize(
     source: process.env.HASURA_GRAPHQL_SOURCE || defaultSource,
   },
   {
-    dry: true,
+    dry: false,
     relations: true,
+    pgMaterializedViews: true,
   }
 ).catch((err) => console.error(err));

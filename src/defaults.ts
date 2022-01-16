@@ -1,10 +1,6 @@
+import { RootFieldsType, TableNameConvertedType } from './types';
 import camelize from 'camelcase';
 import pluralize from 'pluralize';
-
-export type TableNameConvertedType = {
-  singular: string;
-  plural: string;
-};
 
 export function tableNameTransformer(name: string): TableNameConvertedType {
   const tableName = camelize(name);
@@ -17,20 +13,10 @@ export function tableNameTransformer(name: string): TableNameConvertedType {
 }
 
 export function columnNameTransformer(name: string): string {
-  return camelize(name);
+  // Hasura converts '?' to '_' by default
+  return camelize(name).replace(/[?]/g, '_');
 }
 
-export type RootFieldsType = {
-  select: string;
-  select_by_pk: string;
-  select_aggregate: string;
-  insert: string;
-  insert_one: string;
-  update: string;
-  update_by_pk: string;
-  delete: string;
-  delete_by_pk: string;
-};
 export function rootFieldTransformer({
   plural,
   singular,
