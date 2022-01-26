@@ -72,7 +72,7 @@ export async function hasuraCamelize(
         tableName,
         defaults.columnNameTransformer
       );
-      if (columnName) {
+      if (columnName !== value && columnName) {
         state[value] = columnName;
       }
       return state;

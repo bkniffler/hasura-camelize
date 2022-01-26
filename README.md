@@ -100,6 +100,12 @@ convert(
 );
 ```
 
+## Changes
+
+### 1.2.3
+
+- Fix: Don't post columns that produce the same name (e.g. `col1` -> `col1`)
+
 ## Credits
 
 - Original github issue in hasura repository: https://github.com/hasura/graphql-engine/issues/3320
