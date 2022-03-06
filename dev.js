@@ -8,8 +8,8 @@ const {
 
 hasuraCamelize(
   {
-    host: process.env.HASURA_GRAPHQL_HOST,
-    secret: process.env.HASURA_ADMIN_SECRET,
+    host: process.env.HASURA_GRAPHQL_ENDPOINT,
+    secret: process.env.HASURA_GRAPHQL_ADMIN_SECRET,
     schema: process.env.HASURA_GRAPHQL_SCHEMA || defaultSchema,
     source: process.env.HASURA_GRAPHQL_SOURCE || defaultSource,
   },

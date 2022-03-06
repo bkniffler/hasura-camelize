@@ -22,6 +22,7 @@ hasura-camelize --host https://some.domain --secret some-secret --relations --pg
 - _optional_ include=string[]: Only change the tables specified
 - _optional_ _new_ relations: relation names to be renamed
 - _optional_ _new_ pgMaterializedViews: Rename postgresql materialized views/columns also
+- _optional_ _new_ pattern: Renaming pattern, default will result in names e.g. 'usersInsert', 'invert' results in e.g. 'insertUsers'
 
 ## From code
 
@@ -101,6 +102,10 @@ convert(
 ```
 
 ## Changes
+
+### 1.2.4
+
+- Add: --pattern argument
 
 ### 1.2.3
 

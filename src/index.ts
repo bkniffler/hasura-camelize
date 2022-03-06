@@ -10,13 +10,15 @@ export async function hasuraCamelize(
   {
     dry = false,
     relations = false,
+    pattern = 'default',
     pgMaterializedViews = false,
     transformTableNames = defaults.tableNameTransformer,
-    getRootFieldNames = defaults.rootFieldTransformer,
+    getRootFieldNames,
     transformColumnNames = defaults.columnNameTransformer,
   }: {
     dry?: boolean;
     relations?: boolean;
+    pattern?: 'invert' | 'default';
     pgMaterializedViews?: boolean;
     transformTableNames?: (
       name: string,
@@ -29,10 +31,15 @@ export async function hasuraCamelize(
     ) => OptionalResultType<string>;
     getRootFieldNames?: (
       name: TableNameConvertedType,
-      defaultTransformer: typeof defaults.rootFieldTransformer
+      defaultTransformer: typeof defaults.rootFieldTransformerDefault
     ) => RootFieldsType;
   }
 ) {
+  const defaultRootFieldNames =
+    pattern === 'invert'
+      ? defaults.rootFieldTransformerInvert
+      : defaults.rootFieldTransformerDefault;
+  if (!getRootFieldNames) getRootFieldNames = defaultRootFieldNames;
   if (!dbOptions.host) throw new Error('No host provided');
 
   console.log('--- Settings ---');
@@ -63,7 +70,7 @@ export async function hasuraCamelize(
     if (!tableNames) continue;
     const customRootFields = getRootFieldNames(
       tableNames,
-      defaults.rootFieldTransformer
+      defaultRootFieldNames
     );
 
     const customColumnNames = data[tableName].reduce((state, value) => {

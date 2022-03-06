@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+const { resolve } = require('path');
+require('dotenv').config({ path: resolve(process.cwd(), '.env') });
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const argv = yargs(hideBin(process.argv)).argv;
@@ -14,14 +16,15 @@ const include = argv.include && argv.include.split(',').map((x) => x.trim());
 
 hasuraCamelize(
   {
-    host: argv.host,
-    secret: argv.secret,
-    schema: argv.schema || defaultSchema,
-    source: argv.source || defaultSource,
+    host: argv.host || process.env.HASURA_GRAPHQL_ENDPOINT,
+    secret: argv.secret || process.env.HASURA_GRAPHQL_ADMIN_SECRET,
+    schema: argv.schema || process.env.HASURA_GRAPHQL_SCHEMA || defaultSchema,
+    source: argv.source || process.env.HASURA_GRAPHQL_SOURCE || defaultSource,
   },
   {
     dry: argv.dry,
     relations: argv.relations,
+    pattern: argv.pattern,
     transformTableNames(tableName, defaultTransform) {
       if (exclude && exclude.includes(tableName)) {
         return undefined;
