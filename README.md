@@ -103,6 +103,10 @@ convert(
 
 ## Changes
 
+### 2.0.0
+
+- Add: updateMany and selectStream root fields
+
 ### 1.2.4
 
 - Add: --pattern argument

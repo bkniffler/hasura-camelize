@@ -9,10 +9,12 @@ export type RootFieldsType = {
   select: string;
   select_by_pk: string;
   select_aggregate: string;
+  select_stream: string;
   insert: string;
   insert_one: string;
   update: string;
   update_by_pk: string;
+  update_many: string;
   delete: string;
   delete_by_pk: string;
 };

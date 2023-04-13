@@ -16,8 +16,8 @@ const include = argv.include && argv.include.split(',').map((x) => x.trim());
 
 hasuraCamelize(
   {
-    host: argv.host || process.env.HASURA_GRAPHQL_ENDPOINT,
-    secret: argv.secret || process.env.HASURA_GRAPHQL_ADMIN_SECRET,
+    host: argv.host || argv.endpoint || process.env.HASURA_GRAPHQL_ENDPOINT,
+    secret: argv.secret || argv['admin-secret'] || process.env.HASURA_GRAPHQL_ADMIN_SECRET,
     schema: argv.schema || process.env.HASURA_GRAPHQL_SCHEMA || defaultSchema,
     source: argv.source || process.env.HASURA_GRAPHQL_SOURCE || defaultSource,
   },
