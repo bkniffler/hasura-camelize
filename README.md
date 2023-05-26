@@ -23,6 +23,7 @@ hasura-camelize --host https://some.domain --secret some-secret --relations --pg
 - _optional_ _new_ relations: relation names to be renamed
 - _optional_ _new_ pgMaterializedViews: Rename postgresql materialized views/columns also
 - _optional_ _new_ pattern: Renaming pattern, default will result in names e.g. 'usersInsert', 'invert' results in e.g. 'insertUsers'
+- _optional_ _new_ insecure-skip-tls-verify: Allow for insecure https hasura endpoints (eg, self signed certificates). Not recommended for use against production deployments.
 
 ## From code
 
