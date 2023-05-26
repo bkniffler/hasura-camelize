@@ -24,7 +24,7 @@ export async function fetchData({
   secret,
   schema = defaultSchema,
   source = defaultSource,
-  agent
+  agent,
 }: DBOptionsType) {
   const { result } = await fetchJson<{ result: string[][] }>(
     `${host}/v2/query`,
@@ -54,7 +54,7 @@ export async function fetchPGMaterializedViewData({
   secret,
   schema = defaultSchema,
   source = defaultSource,
-  agent
+  agent,
 }: DBOptionsType) {
   const views = await fetchJson<{ result: string[][] }>(`${host}/v2/query`, {
     method: 'post',
@@ -176,7 +176,7 @@ export async function pushRelationshipData(
 export async function getMetadata({
   host,
   secret,
-  agent
+  agent,
 }: DBOptionsType): Promise<MetadataType> {
   const data = await fetch(`${host}/v1/metadata`, {
     method: 'post',
