@@ -24,11 +24,13 @@ export async function fetchData({
   secret,
   schema = defaultSchema,
   source = defaultSource,
+  agent
 }: DBOptionsType) {
   const { result } = await fetchJson<{ result: string[][] }>(
     `${host}/v2/query`,
     {
       method: 'post',
+      agent: agent,
       body: {
         type: 'run_sql',
         args: {
@@ -52,9 +54,11 @@ export async function fetchPGMaterializedViewData({
   secret,
   schema = defaultSchema,
   source = defaultSource,
+  agent
 }: DBOptionsType) {
   const views = await fetchJson<{ result: string[][] }>(`${host}/v2/query`, {
     method: 'post',
+    agent: agent,
     body: {
       type: 'run_sql',
       args: {
@@ -79,6 +83,7 @@ export async function fetchPGMaterializedViewData({
     `${host}/v2/query`,
     {
       method: 'post',
+      agent: agent,
       body: {
         type: 'run_sql',
         args: {
@@ -111,7 +116,7 @@ export async function fetchPGMaterializedViewData({
 }
 
 export async function pushData(
-  { host, secret, schema, source = defaultSource }: DBOptionsType,
+  { host, secret, schema, source = defaultSource, agent }: DBOptionsType,
   args: {
     tableName: string;
     customTableName: string;
@@ -121,6 +126,7 @@ export async function pushData(
 ) {
   await fetchJson(`${host}/v1/metadata`, {
     method: 'post',
+    agent: agent,
     body: {
       type: 'pg_set_table_customization',
       args: {
@@ -141,7 +147,7 @@ export async function pushData(
 }
 
 export async function pushRelationshipData(
-  { host, secret, schema, source = defaultSource }: DBOptionsType,
+  { host, secret, schema, source = defaultSource, agent }: DBOptionsType,
   args: {
     tableName: string;
     oldName: string;
@@ -150,6 +156,7 @@ export async function pushRelationshipData(
 ) {
   await fetchJson(`${host}/v1/metadata`, {
     method: 'post',
+    agent: agent,
     body: {
       type: 'pg_rename_relationship',
       args: {
@@ -169,9 +176,11 @@ export async function pushRelationshipData(
 export async function getMetadata({
   host,
   secret,
+  agent
 }: DBOptionsType): Promise<MetadataType> {
   const data = await fetch(`${host}/v1/metadata`, {
     method: 'post',
+    agent: agent,
     body: JSON.stringify({
       type: 'export_metadata',
       version: 2,

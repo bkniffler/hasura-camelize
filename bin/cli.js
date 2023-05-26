@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { Agent } = require('https');
 const { resolve } = require('path');
 require('dotenv').config({ path: resolve(process.cwd(), '.env') });
 const yargs = require('yargs/yargs');
@@ -11,6 +12,10 @@ const {
   defaultSource,
 } = require('../build/main');
 
+const agent = new Agent({
+    rejectUnauthorized: !argv.insecureSkipTlsVerify ?? true
+});
+
 const exclude = argv.exclude && argv.exclude.split(',').map((x) => x.trim());
 const include = argv.include && argv.include.split(',').map((x) => x.trim());
 
@@ -20,6 +25,7 @@ hasuraCamelize(
     secret: argv.secret || argv['admin-secret'] || process.env.HASURA_GRAPHQL_ADMIN_SECRET,
     schema: argv.schema || process.env.HASURA_GRAPHQL_SCHEMA || defaultSchema,
     source: argv.source || process.env.HASURA_GRAPHQL_SOURCE || defaultSource,
+    agent: agent,
   },
   {
     dry: argv.dry,

@@ -116,7 +116,7 @@ export async function hasuraCamelize(
             if (rel.name !== newName && newName) {
               console.log(`${rel.name} => ${newName}`);
               if (!dry) {
-                await api.pushRelationshipData(dbOptions, {
+                await api.pushRelationshipData(Object.assign({}, dbOptions, {schema: table.table.schema}), {
                   tableName: table.table.name,
                   newName,
                   oldName: rel.name,
@@ -134,7 +134,7 @@ export async function hasuraCamelize(
             if (rel.name !== newName && newName) {
               console.log(`${rel.name} => ${newName}`);
               if (!dry) {
-                await api.pushRelationshipData(dbOptions, {
+                await api.pushRelationshipData(Object.assign({}, dbOptions, {schema: table.table.schema}), {
                   tableName: table.table.name,
                   newName,
                   oldName: rel.name,
