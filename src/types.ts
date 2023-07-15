@@ -1,11 +1,12 @@
-import type { Agent } from 'https';
+import type { Agent as AgentHttp } from 'http';
+import type { Agent as AgentHttps } from 'https';
 
 export interface DBOptionsType {
   host: string;
   secret: string;
   source?: string;
   schema?: string;
-  agent?: Agent;
+  agent?: AgentHttp | AgentHttps;
 }
 
 export type RootFieldsType = {

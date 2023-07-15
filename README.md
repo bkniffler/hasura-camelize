@@ -104,6 +104,14 @@ convert(
 
 ## Changes
 
+### 2.0.2
+
+- Fix: Parse http(s) prototcol from args and use the appropriate HTTP agent type
+
+### 2.0.1
+
+- Add: --insecure-skip-tls-verify argument
+
 ### 2.0.0
 
 - Add: updateMany and selectStream root fields
