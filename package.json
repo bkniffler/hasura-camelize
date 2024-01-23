@@ -5,9 +5,7 @@
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
   "license": "MIT",
-  "bin": {
-    "hasura-camelize": "./bin/cli.js"
-  },
+  "bin": "./bin/cli.js",
   "scripts": {
     "dev": "run-p build:* && node dev.js",
     "build": "run-p build:*",
@@ -15,8 +13,8 @@
     "build:module": "tsc -p tsconfig.module.json"
   },
   "dependencies": {
-    "dotenv": "^12.0.3",
     "camelcase": "^6.2.0",
+    "dotenv": "^12.0.3",
     "node-fetch": "^2.6.1",
     "pluralize": "^8.0.0",
     "yargs": "^17.0.1"
